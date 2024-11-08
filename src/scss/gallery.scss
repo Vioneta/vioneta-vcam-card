@@ -1,0 +1,12 @@
+:host {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+frigate-card-surround-basic {
+  // This must be re-specified (in addition to on the top card element) to
+  // ensure the filter 'tab' on the gallery drawer is correctly included on the
+  // non-scrolling part of the gallery.
+  max-height: var(--frigate-card-max-height);
+}

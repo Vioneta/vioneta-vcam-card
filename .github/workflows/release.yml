@@ -1,0 +1,55 @@
+---
+name: Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node and Yarn
+        uses: volta-cli/action@v4
+
+      - name: Install dependencies
+        run: yarn install --immutable
+
+      - name: Build the files
+        run: yarn run build
+
+      - name: Zip the files
+        uses: thedoctor0/zip-release@0.7.1
+        with:
+          type: zip
+          path: dist
+          filename: frigate-hass-card.zip
+
+      - name: Upload JS files to release
+        uses: svenstaro/upload-release-action@2.6.1
+
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: dist/*.js
+          file_glob: true
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: Upload Zip file to release
+        uses: svenstaro/upload-release-action@2.6.1
+
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: frigate-hass-card.zip
+          tag: ${{ github.ref }}
+          overwrite: true
+
+      - name: HACS release validation
+        uses: hacs/action@21.12.1
+        with:
+          category: plugin
